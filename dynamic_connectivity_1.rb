@@ -1,18 +1,23 @@
 # inefficient draft:
-# path = ls[1].path_to( ls[9] )
+#
+# irb -r ./dynamic_connectivity_1.rb
+# ls = LegoSet.example_queries
+# ls2 = LegoSet.secondary_example
+# LegoSet.example_queries( ls2, LegoSet::SECONDARY_EXAMPLES )
 # SystemStackError: stack level too deep
 #         from /Users/jthomas/.rvm/rubies/ruby-1.9.3-p385-perf/lib/ruby/1.9.1/irb/workspace.rb:80
 # Maybe IRB bug!
-#
-# irb -r ./dynamic_connectivity_1.rb
 
 class LegoSet
-  EXAMPLES = [
+  INITIAL_EXAMPLES = [
     {[0,7] => false},
     {[8,9] => true}
   ]
+  SECONDARY_EXAMPLES = [
+    {[0,7] => true},
+  ]
 
-  def self.example
+  def self.initial_example
     LegoSet.construct( 10 ).tap do |ls|
       Lego.connect( ls[1], ls[2] )
       Lego.connect( ls[3], ls[4] )
@@ -22,8 +27,16 @@ class LegoSet
     end
   end
 
-  def self.example_queries( ls = example )
-    EXAMPLES.each do |hash|
+  def self.secondary_example( ls = initial_example )
+      Lego.connect( ls[5], ls[0] )
+      Lego.connect( ls[7], ls[2] )
+      Lego.connect( ls[6], ls[1] )
+      Lego.connect( ls[1], ls[0] )
+      return ls
+  end
+
+  def self.example_queries( ls = initial_example, examples = INITIAL_EXAMPLES )
+    examples.each do |hash|
       first_index = hash.keys.first.first
       second_index = hash.keys.first.last
       expected_connection = hash.values.last
