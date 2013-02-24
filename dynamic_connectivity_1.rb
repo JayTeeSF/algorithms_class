@@ -78,6 +78,11 @@ class LegoSet
 end
 
 require 'set'
+
+# properties:
+#   reflexive: p is connected to p.
+#   symmetric: if p is connected to q then q is connected to p.
+#   transitive: if p is connected to q and q is connected to r then p is connected to r.
 class Lego
   DEBUG = false
   attr_reader :connections
@@ -90,7 +95,7 @@ class Lego
   attr_reader :name
   def initialize( name )
     @name = name
-    @connections = Set.new
+    @connections = Set.new [ self ]
   end
 
   def connect( other_lego )
@@ -103,7 +108,7 @@ class Lego
       path += [ self, other_lego ]
     else
       possible_path = nil
-      connections.detect do |connection|
+      selfless_connections.detect do |connection|
         possible_path = connection.path_to( other_lego, path + [self] )
         ( possible_path.last == other_lego )
        # .tap do |result|
@@ -116,6 +121,11 @@ class Lego
   end
 
   private
+  def selfless_connections
+    @selfless_connections = connections - [ self ] unless @selfless_connections
+    return @selfless_connections
+  end
+
   def directly_connected_to?( other_lego )
     connections.include?( other_lego )
   end
