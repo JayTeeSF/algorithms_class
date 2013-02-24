@@ -1,24 +1,47 @@
-# first (thoughtless) draft -- probably quadratic ...I haven't even thought about it
-#
-# irb -r ./dynamic_connectivity_1.rb
-# ls = LegoSet.construct( 9 )
-#
-# Lego.connect( ls[1], ls[2] )
-# Lego.connect( ls[3], ls[4] )
-# Lego.connect( ls[3], ls[8] )
-# Lego.connect( ls[4], ls[9] )
-# Lego.connect( ls[5], ls[6] )
-#
-# path = ls[1].path_to( ls[2] )
-# puts path.map(&:name) unless path.nil?
-# => 2
-#
+# inefficient draft:
 # path = ls[1].path_to( ls[9] )
 # SystemStackError: stack level too deep
 #         from /Users/jthomas/.rvm/rubies/ruby-1.9.3-p385-perf/lib/ruby/1.9.1/irb/workspace.rb:80
 # Maybe IRB bug!
+#
+# irb -r ./dynamic_connectivity_1.rb
 
 class LegoSet
+  EXAMPLES = [
+    {[0,7] => false},
+    {[8,9] => true}
+  ]
+
+  def self.example
+    LegoSet.construct( 10 ).tap do |ls|
+      Lego.connect( ls[1], ls[2] )
+      Lego.connect( ls[3], ls[4] )
+      Lego.connect( ls[3], ls[8] )
+      Lego.connect( ls[4], ls[9] )
+      Lego.connect( ls[5], ls[6] )
+    end
+  end
+
+  def self.example_queries( ls = example )
+    EXAMPLES.each do |hash|
+      first_index = hash.keys.first.first
+      second_index = hash.keys.first.last
+      expected_connection = hash.values.last
+
+      path = ls[first_index].path_to( ls[second_index] )
+      print "fi: #{first_index}, si: #{second_index}, ec: #{expected_connection}"
+      if path.nil? || path.empty?
+        actual_connection = false
+        print " <=> ac: #{actual_connection}"
+      else
+        actual_connection = true
+        print " <=> ac: #{actual_connection}"
+        print ", path: #{path.map(&:name)}"
+      end
+      puts "\n"
+    end
+  end
+
   def self.construct( number )
     new.tap do |lego_set|
       number.times do |lego_name|
@@ -43,6 +66,7 @@ end
 
 require 'set'
 class Lego
+  DEBUG = false
   attr_reader :connections
 
   def self.connect( one_lego, another_lego )
@@ -61,15 +85,19 @@ class Lego
   end
 
   def path_to( other_lego, path = [] )
+    debug { "#{name} => #{other_lego.name}; path: #{path.map(&:name)}" }
     if directly_connected_to?( other_lego )
-      path << other_lego
+      path += [ self, other_lego ]
     else
       possible_path = nil
       connections.detect do |connection|
-        possible_path = connection.path_to( other_lego, path )
-        possible_path.last == other_lego
+        possible_path = connection.path_to( other_lego, path + [self] )
+        ( possible_path.last == other_lego )
+       # .tap do |result|
+       #   possible_path.unshift( self ) if result
+       # end
       end
-      path += possible_path unless possible_path.nil?
+      path = possible_path unless possible_path.nil?
     end
     return path
   end
@@ -77,5 +105,11 @@ class Lego
   private
   def directly_connected_to?( other_lego )
     connections.include?( other_lego )
+  end
+
+  def debug
+    if DEBUG && block_given?
+      puts yield
+    end
   end
 end
