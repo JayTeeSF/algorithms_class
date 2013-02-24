@@ -77,6 +77,9 @@ class LegoSet
   end
 end
 
+class ConnectedComponent
+end
+
 require 'set'
 
 # properties:
@@ -88,6 +91,7 @@ class Lego
   attr_reader :connections
 
   def self.connect( one_lego, another_lego )
+    # ConnectedComponent.# need to keep track of what's connected and maintain the minimum set of these components
     one_lego.connect( another_lego )
     another_lego.connect( one_lego )
   end
