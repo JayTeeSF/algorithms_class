@@ -67,7 +67,13 @@ void connect(int p, int q) {
 
   printf("connecting uf[%d] = %d => uf[%d] = %d...", p, uf.array[p], q, uf.array[q]);
   //ufp_p = ufq_p;  //contents of q into p
-  uf.array[p] = uf.array[q]; // maybe put q's value in p, so the two match!
+  int pid = uf.array[p];
+  //uf.array[p] = uf.array[q]; // maybe put q's value in p, so the two match!
+  for(int i=0; i<uf.size; i++) {
+    if (uf.array[i] == pid) {
+      uf.array[i] = uf.array[q];
+    }
+  }
   printf("\nconnected uf[%d] = %d => uf[%d] = %d\n", p, uf.array[p], q, uf.array[q]);
   //print_uf(N);
   print_int_ary(&uf);
