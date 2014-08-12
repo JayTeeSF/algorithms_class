@@ -60,6 +60,7 @@ int connected(int p, int q) {
 
 
 // union:
+// FIXME: forgot to update all entries who are currently pointing to the same value as uf[p]
 void connect(int p, int q) {
   //int *ufp_p = &uf[p];
   //int *ufq_p = &uf[q];
