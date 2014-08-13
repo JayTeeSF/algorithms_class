@@ -4,8 +4,8 @@
 #include <assert.h>
 #include <ctype.h>
 
-// cc -Wall -std=c99 union_find_controller.c -o union_find_controller
-// cat tinyUF.txt | ./union_find_controller
+// cc -Wall -std=c99 quick_find_union_find.c -o quick_find_union_find
+// cat tinyUF.txt | ./quick_find_union_find
 
 typedef struct UF {
   char name[50];
